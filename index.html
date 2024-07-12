@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harshal Jethwa's Resume</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      /* text-align: center; */
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 2.5em;
+      color: #0073e6;
+    }
+    .header p {
+      font-size: 1.2em;
+      margin: 5px 0;
+      text-align: left; /* Align text to the left */
+    }
+    .profile-links {
+      margin-top: 10px;
+    }
+    .profile-links a {
+      display: block; /* Ensures each link is on a new line */
+      margin-bottom: 5px; /* Adds space between links */
+      text-decoration: none;
+      color: #0073e6;
+    }
+    .profile-links a:hover {
+      text-decoration: underline;
+    }
+    .profile-links img {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      /* vertical-align: middle; */
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section h2 {
+      border-bottom: 2px solid #0073e6;
+      padding-bottom: 5px;
+      color: #0073e6;
+      font-size: 1.8em;
+    }
+    .section p, .section ul, .section div {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .skills, .languages, .interests, .projects, .certificates {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .skills li, .languages li, .interests li, .projects li, .certificates li {
+      flex: 1 1 45%;
+      margin-bottom: 10px;
+    }
+    /* Added new style for email and phone alignment */
+    /* .contact-info {
+      text-align: left;
+    }
+    .email {
+      text-align: right;
+    } */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 id="name">Loading...</h1>
+      <b><p id="label"> </p> </b>
+      <p id="location"></p>
+      <div class="profile-links" id="profiles"></div>
+      <!-- Adjusted structure for contact info -->
+      <div class="contact-info">
+        <p style="text-align: left;" class="email header">Email: <span id="email"></span></p>
+        <p>Phone: <span id="phone"></span></p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Work Experience</h2>
+      <div id="work-experience"></div>
+    </div>
+
+    <div class="section">
+      <h2>Education</h2>
+      <div id="education"></div>
+    </div>
+
+    <div class="section">
+      <h2>Skills</h2>
+      <ul id="skills"></ul>
+    </div>
+
+    <div class="section">
+      <h2>Projects</h2>
+      <ul id="projects"></ul>
+    </div>
+
+    <div class="section">
+      <h2>Languages</h2>
+      <ul id="languages"></ul>
+    </div>  
+
+    <div class="section">
+      <h2>Certificates</h2>
+      <ul id="certificates"></ul>
+    </div>
+
+    <div class="section">
+      <h2>Achievements</h2>
+      <div id="achievements"></div>
+    </div>
+
+    <div class="section">
+      <h2>Interests</h2>
+      <ul id="interests"></ul>
+    </div>
+
+    <div class="section">
+      <h2>Volunteer Work</h2>
+      <div id="volunteer"></div>
+    </div>
+  </div>
+
+<script>
+    // script.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchResumeData();
+});
+
+async function fetchResumeData() {
+    try {
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        const targetUrl = 'https://dqfg32m0ue.execute-api.ap-south-1.amazonaws.com/prod/resume';
+        const apiUrl = proxyUrl + targetUrl;
+
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Origin': window.location.origin // Ensure CORS proxy knows the origin
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch data');
+        }
+
+        const data = await response.json();
+        populateResume(data);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        const container = document.querySelector('.container');
+        container.innerHTML = '<p>Error fetching data. Please try again later.</p>';
+    }
+}
+
+function populateResume(resumeData) {
+    const nameElement = document.getElementById('name');
+    const labelElement = document.getElementById('label');
+    const locationElement = document.getElementById('location');
+    const emailElement = document.getElementById('email');
+    const phoneElement = document.getElementById('phone');
+    const profilesContainer = document.getElementById('profiles');
+    const workExperienceContainer = document.getElementById('work-experience');
+    const educationContainer = document.getElementById('education');
+    const skillsContainer = document.getElementById('skills');
+    const projectsContainer = document.getElementById('projects');
+    const languagesContainer = document.getElementById('languages');
+    const certificatesContainer = document.getElementById('certificates');
+    const achievementsContainer = document.getElementById('achievements');
+    const interestsContainer = document.getElementById('interests');
+    const volunteerContainer = document.getElementById('volunteer');
+
+    if (resumeData.name) nameElement.textContent = resumeData.name;
+    if (resumeData.label) labelElement.textContent = resumeData.label;
+    if (resumeData.location) {
+        const location = resumeData.location;
+        locationElement.textContent = `${location.city ?? ''}, ${location.region ?? ''}, ${location.countryCode ?? ''}`;
+    }
+    if (resumeData.email) emailElement.textContent = resumeData.email;
+    if (resumeData.phone) phoneElement.textContent = resumeData.phone;
+
+    if (resumeData.profiles) {
+        resumeData.profiles.forEach(profile => {
+            if (profile.url && profile.network) {
+                const link = document.createElement('a');
+                link.href = profile.url;
+                link.textContent = profile.network;
+                link.target = '_blank';
+                profilesContainer.appendChild(link);
+                profilesContainer.appendChild(document.createElement('br'));
+            }
+        });
+    }
+
+    if (resumeData.work) {
+        resumeData.work.forEach(job => {
+            const jobDiv = document.createElement('div');
+            jobDiv.innerHTML = `<p><strong>${job.position ?? ''} at ${job.name ?? ''}</strong> (${job.startDate ?? ''} - ${job.endDate ?? ''})<br>${job.summary ?? ''}</p>`;
+            workExperienceContainer.appendChild(jobDiv);
+        });
+    }
+
+    if (resumeData.education) {
+        resumeData.education.forEach(edu => {
+            const eduDiv = document.createElement('div');
+            eduDiv.innerHTML = `<p><strong>${edu.institution ?? ''}</strong> - ${edu.area ?? ''} (${edu.studyType ?? ''}) ${edu.startDate ?? ''} - ${edu.endDate ?? ''}, Score: ${edu.score ?? ''}</p>`;
+            educationContainer.appendChild(eduDiv);
+        });
+    }
+
+    if (resumeData.skills) {
+        resumeData.skills.forEach(skill => {
+            const skillLi = document.createElement('li');
+            skillLi.textContent = `${skill.name ?? ''} (${skill.level ?? ''})`;
+            skillsContainer.appendChild(skillLi);
+        });
+    }
+
+    if (resumeData.projects) {
+        resumeData.projects.forEach(project => {
+            const projectLi = document.createElement('li');
+            projectLi.innerHTML = `<strong>${project.name ?? ''}</strong>: ${project.description ?? ''}`;
+            projectsContainer.appendChild(projectLi);
+        });
+    }
+
+    if (resumeData.languages) {
+        resumeData.languages.forEach(lang => {
+            const langLi = document.createElement('li');
+            langLi.textContent = `${lang.language ?? ''} (${lang.fluency ?? ''})`;
+            languagesContainer.appendChild(langLi);
+        });
+    }
+
+    if (resumeData.certificates) {
+        resumeData.certificates.forEach(cert => {
+            const certLi = document.createElement('li');
+            certLi.textContent = `${cert.title ?? ''} (${cert.date ?? ''})`;
+            certificatesContainer.appendChild(certLi);
+        });
+    }
+
+    if (resumeData.Achievement && resumeData.Achievement.organization) {
+        achievementsContainer.textContent = resumeData.Achievement.organization;
+    }
+
+    if (resumeData.interests) {
+        resumeData.interests.forEach(interest => {
+            const interestLi = document.createElement('li');
+            interestLi.textContent = interest.name ?? '';
+            interestsContainer.appendChild(interestLi);
+        });
+    }
+
+    if (resumeData.volunteer) {
+        const volunteer = resumeData.volunteer;
+        volunteerContainer.innerHTML = `<p><strong>${volunteer.organization ?? ''}</strong> - ${volunteer.position ?? ''} (${volunteer.startDate ?? ''} - ${volunteer.endDate ?? ''})</p>`;
+    }
+}
+
+</script>
+</body>
+</html>
