@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Praneeth's Resume</title>
+  <title>Harshal Jethwa's Resume</title>
   <style>
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -142,143 +142,118 @@
     </div>
   </div>
 
-<script>
-    // script.js
+  <script>
+    const apiUrl = 'https://dqfg32m0ue.execute-api.ap-south-1.amazonaws.com/prod/resume';
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchResumeData();
-});
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log('API Response:', data);
 
-async function fetchResumeData() {
-    try {
-        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        const targetUrl = 'https://dqfg32m0ue.execute-api.ap-south-1.amazonaws.com/prod/resume';
-        const apiUrl = proxyUrl + targetUrl;
+        const resumeData = data;
+        console.log('Resume Data:', resumeData);
 
-        const response = await fetch(apiUrl, {
-            headers: {
-                'Origin': window.location.origin // Ensure CORS proxy knows the origin
+        if (resumeData.name) document.getElementById('name').innerText = resumeData.name;
+        if (resumeData.label) document.getElementById('label').innerText = resumeData.label;
+        if (resumeData.location) {
+          const location = resumeData.location;
+          document.getElementById('location').innerText = `${location.city ?? ''}, ${location.region ?? ''}, ${location.countryCode ?? ''}`;
+        }
+        if (resumeData.email) document.getElementById('email').innerText = resumeData.email;
+        if (resumeData.phone) document.getElementById('phone').innerText = resumeData.phone;
+
+        const profilesContainer = document.getElementById('profiles');
+        if (resumeData.profiles) {
+          resumeData.profiles.forEach(profile => {
+            if (profile.url && profile.network) {
+              const a = document.createElement('a');
+              a.href = profile.url;
+              a.target = '_blank';
+              a.innerText = profile.network;
+              profilesContainer.appendChild(a);
             }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch data');
+          });
         }
 
-        const data = await response.json();
-        populateResume(data);
-    } catch (error) {
+        const workExperienceContainer = document.getElementById('work-experience');
+        if (resumeData.work) {
+          resumeData.work.forEach(job => {
+            const { name, position, startDate, endDate, summary } = job;
+            const div = document.createElement('div');
+            div.innerHTML = `<p><strong>${position ?? ''} at ${name ?? ''}</strong> (${startDate ?? ''} - ${endDate ?? ''})<br>${summary ?? ''}</p>`;
+            workExperienceContainer.appendChild(div);
+          });
+        }
+
+        const educationContainer = document.getElementById('education');
+        if (resumeData.education) {
+          resumeData.education.forEach(edu => {
+            const { institution, area, studyType, startDate, endDate, score } = edu;
+            const div = document.createElement('div');
+            div.innerHTML = `<p><strong>${institution ?? ''}</strong> - ${area ?? ''} (${studyType ?? ''}) ${startDate ?? ''} - ${endDate ?? ''}, Score: ${score ?? ''}</p>`;
+            educationContainer.appendChild(div);
+          });
+        }
+
+        const skillsContainer = document.getElementById('skills');
+        if (resumeData.skills) {
+          resumeData.skills.forEach(skill => {
+            const li = document.createElement('li');
+            li.innerText = `${skill.name ?? ''} (${skill.level ?? ''})`;
+            skillsContainer.appendChild(li);
+          });
+        }
+
+        const languagesContainer = document.getElementById('languages');
+        if (resumeData.languages) {
+          resumeData.languages.forEach(lang => {
+            const li = document.createElement('li');
+            li.innerText = `${lang.language ?? ''} (${lang.fluency ?? ''})`;
+            languagesContainer.appendChild(li);
+          });
+        }
+
+        const interestsContainer = document.getElementById('interests');
+        if (resumeData.interests) {
+          resumeData.interests.forEach(interest => {
+            const li = document.createElement('li');
+            li.innerText = interest.name ?? '';
+            interestsContainer.appendChild(li);
+          });
+        }
+
+        const projectsContainer = document.getElementById('projects');
+        if (resumeData.projects) {
+          resumeData.projects.forEach(project => {
+            const li = document.createElement('li');
+            li.innerText = `${project.name ?? ''} - ${project.description ?? ''}`;
+            projectsContainer.appendChild(li);
+          });
+        }
+
+        const certificatesContainer = document.getElementById('certificates');
+        if (resumeData.certificates) {
+          resumeData.certificates.forEach(cert => {
+            const li = document.createElement('li');
+            li.innerText = `${cert.title ?? ''} (${cert.date ?? ''})`;
+            certificatesContainer.appendChild(li);
+          });
+        }
+
+        if (resumeData.Achievement && resumeData.Achievement.organization) {
+          document.getElementById('achievements').innerText = resumeData.Achievement.organization;
+        }
+
+        if (resumeData.volunteer) {
+          const volunteer = resumeData.volunteer;
+          const volunteerContainer = document.getElementById('volunteer');
+          volunteerContainer.innerHTML = `<strong>${volunteer.organization ?? ''}</strong> - ${volunteer.position ?? ''} (${volunteer.startDate ?? ''} - ${volunteer.endDate ?? ''})`;
+        }
+      })
+      .catch(error => {
         console.error('Error fetching data:', error);
-        const container = document.querySelector('.container');
-        container.innerHTML = '<p>Error fetching data. Please try again later.</p>';
-    }
-}
-
-function populateResume(resumeData) {
-    const nameElement = document.getElementById('name');
-    const labelElement = document.getElementById('label');
-    const locationElement = document.getElementById('location');
-    const emailElement = document.getElementById('email');
-    const phoneElement = document.getElementById('phone');
-    const profilesContainer = document.getElementById('profiles');
-    const workExperienceContainer = document.getElementById('work-experience');
-    const educationContainer = document.getElementById('education');
-    const skillsContainer = document.getElementById('skills');
-    const projectsContainer = document.getElementById('projects');
-    const languagesContainer = document.getElementById('languages');
-    const certificatesContainer = document.getElementById('certificates');
-    const achievementsContainer = document.getElementById('achievements');
-    const interestsContainer = document.getElementById('interests');
-    const volunteerContainer = document.getElementById('volunteer');
-
-    if (resumeData.name) nameElement.textContent = resumeData.name;
-    if (resumeData.label) labelElement.textContent = resumeData.label;
-    if (resumeData.location) {
-        const location = resumeData.location;
-        locationElement.textContent = `${location.city ?? ''}, ${location.region ?? ''}, ${location.countryCode ?? ''}`;
-    }
-    if (resumeData.email) emailElement.textContent = resumeData.email;
-    if (resumeData.phone) phoneElement.textContent = resumeData.phone;
-
-    if (resumeData.profiles) {
-        resumeData.profiles.forEach(profile => {
-            if (profile.url && profile.network) {
-                const link = document.createElement('a');
-                link.href = profile.url;
-                link.textContent = profile.network;
-                link.target = '_blank';
-                profilesContainer.appendChild(link);
-                profilesContainer.appendChild(document.createElement('br'));
-            }
-        });
-    }
-
-    if (resumeData.work) {
-        resumeData.work.forEach(job => {
-            const jobDiv = document.createElement('div');
-            jobDiv.innerHTML = `<p><strong>${job.position ?? ''} at ${job.name ?? ''}</strong> (${job.startDate ?? ''} - ${job.endDate ?? ''})<br>${job.summary ?? ''}</p>`;
-            workExperienceContainer.appendChild(jobDiv);
-        });
-    }
-
-    if (resumeData.education) {
-        resumeData.education.forEach(edu => {
-            const eduDiv = document.createElement('div');
-            eduDiv.innerHTML = `<p><strong>${edu.institution ?? ''}</strong> - ${edu.area ?? ''} (${edu.studyType ?? ''}) ${edu.startDate ?? ''} - ${edu.endDate ?? ''}, Score: ${edu.score ?? ''}</p>`;
-            educationContainer.appendChild(eduDiv);
-        });
-    }
-
-    if (resumeData.skills) {
-        resumeData.skills.forEach(skill => {
-            const skillLi = document.createElement('li');
-            skillLi.textContent = `${skill.name ?? ''} (${skill.level ?? ''})`;
-            skillsContainer.appendChild(skillLi);
-        });
-    }
-
-    if (resumeData.projects) {
-        resumeData.projects.forEach(project => {
-            const projectLi = document.createElement('li');
-            projectLi.innerHTML = `<strong>${project.name ?? ''}</strong>: ${project.description ?? ''}`;
-            projectsContainer.appendChild(projectLi);
-        });
-    }
-
-    if (resumeData.languages) {
-        resumeData.languages.forEach(lang => {
-            const langLi = document.createElement('li');
-            langLi.textContent = `${lang.language ?? ''} (${lang.fluency ?? ''})`;
-            languagesContainer.appendChild(langLi);
-        });
-    }
-
-    if (resumeData.certificates) {
-        resumeData.certificates.forEach(cert => {
-            const certLi = document.createElement('li');
-            certLi.textContent = `${cert.title ?? ''} (${cert.date ?? ''})`;
-            certificatesContainer.appendChild(certLi);
-        });
-    }
-
-    if (resumeData.Achievement && resumeData.Achievement.organization) {
-        achievementsContainer.textContent = resumeData.Achievement.organization;
-    }
-
-    if (resumeData.interests) {
-        resumeData.interests.forEach(interest => {
-            const interestLi = document.createElement('li');
-            interestLi.textContent = interest.name ?? '';
-            interestsContainer.appendChild(interestLi);
-        });
-    }
-
-    if (resumeData.volunteer) {
-        const volunteer = resumeData.volunteer;
-        volunteerContainer.innerHTML = `<p><strong>${volunteer.organization ?? ''}</strong> - ${volunteer.position ?? ''} (${volunteer.startDate ?? ''} - ${volunteer.endDate ?? ''})</p>`;
-    }
-}
-
-</script>
+        document.getElementById('name').innerText = 'Error loading resume data';
+      });
+  </script>
 </body>
 </html>
